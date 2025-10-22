@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  stirling-pdf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION_TAG: latest
+    container_name: stirling-pdf
+    ports:
+      - "8081:8081"  # Đổi port bên trái nếu 8081 cũng bị chiếm
+    environment:
+      # Server Configuration
+      - SERVER_ADDRESS=0.0.0.0
+      - SERVER_PORT=8081
+      
+      # Optional: Tùy chỉnh JVM memory
+      - JAVA_BASE_OPTS=-XX:+UnlockExperimentalVMOptions -XX:MaxRAMPercentage=75 -XX:InitiatingHeapOccupancyPercent=20 -XX:+G1PeriodicGCInvokesConcurrent -XX:G1PeriodicGCInterval=10000 -XX:+UseStringDeduplication -XX:G1PeriodicGCSystemLoadThreshold=70
+      
+      # User permissions
+      - PUID=1000
+      - PGID=1000
+      - UMASK=022
+      
+      # Feature flags
+      - DISABLE_ADDITIONAL_FEATURES=true
+      
+      # Optional: Security settings (uncomment để enable)
+      # - SECURITY_ENABLE_LOGIN=true
+      # - SECURITY_INITIAL_ADMIN_USERNAME=admin
+      # - SECURITY_INITIAL_ADMIN_PASSWORD=changeme123
+      
+    volumes:
+      # Persist configuration
+      - ./configs:/configs
+      
+      # Persist custom files
+      - ./customFiles:/customFiles
+      
+      # Persist logs
+      - ./logs:/logs
+      
+      # Pipeline folders for automated processing
+      - ./pipeline/watchedFolders:/pipeline/watchedFolders
+      - ./pipeline/finishedFolders:/pipeline/finishedFolders
+      
+      # Tessdata (OCR language data)
+      - ./tessdata:/usr/share/tessdata
+      
+    restart: unless-stopped
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/v1/info"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    networks:
+      - stirling-network
+
+networks:
+  stirling-network:
+    driver: bridge
