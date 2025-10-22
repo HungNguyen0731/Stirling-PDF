@@ -50,7 +50,7 @@ ENV DISABLE_ADDITIONAL_FEATURES=true \
     TEMP=/tmp/stirling-pdf \
     TMP=/tmp/stirling-pdf \
     SERVER_ADDRESS=0.0.0.0 \
-    SERVER_PORT=8080
+    SERVER_PORT=8081
 
 
 # JDK for app
@@ -108,7 +108,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     chown -R stirlingpdfuser:stirlingpdfgroup $HOME /scripts /usr/share/fonts/opentype/noto /configs /customFiles /pipeline /tmp/stirling-pdf && \
     chown stirlingpdfuser:stirlingpdfgroup /app.jar
 
-EXPOSE 8080/tcp
+EXPOSE 8081/tcp
 
 # Set user and run command
 ENTRYPOINT ["tini", "--", "/scripts/init.sh"]
