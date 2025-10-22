@@ -48,7 +48,9 @@ ENV DISABLE_ADDITIONAL_FEATURES=true \
     STIRLING_TEMPFILES_DIRECTORY=/tmp/stirling-pdf \
     TMPDIR=/tmp/stirling-pdf \
     TEMP=/tmp/stirling-pdf \
-    TMP=/tmp/stirling-pdf
+    TMP=/tmp/stirling-pdf \
+    SERVER_ADDRESS=0.0.0.0 \
+    SERVER_PORT=8080
 
 
 # JDK for app
