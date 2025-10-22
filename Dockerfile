@@ -1,10 +1,22 @@
+# Build stage
+FROM gradle:8.5-jdk21-alpine AS build
+
+WORKDIR /app
+
+# Copy source code
+COPY . .
+
+# Build the application
+RUN gradle clean build --no-daemon -x test
+
 # Main stage
 FROM alpine:3.22.2@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
 
 # Copy necessary files
 COPY scripts /scripts
 COPY app/core/src/main/resources/static/fonts/*.ttf /usr/share/fonts/opentype/noto/
-COPY app/core/build/libs/*.jar app.jar
+# Copy JAR file from build stage
+COPY --from=build /app/app/core/build/libs/*.jar app.jar
 
 ARG VERSION_TAG
 
@@ -64,9 +76,9 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     # OCR MY PDF (unpaper for descew and other advanced features)
     tesseract-ocr-data-eng \
     tesseract-ocr-data-chi_sim \
-	tesseract-ocr-data-deu \
-	tesseract-ocr-data-fra \
-	tesseract-ocr-data-por \
+    tesseract-ocr-data-deu \
+    tesseract-ocr-data-fra \
+    tesseract-ocr-data-por \
     unpaper \
     # CV
     py3-opencv \
